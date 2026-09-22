@@ -1,18 +1,40 @@
 name: Build & Test
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 env:
-    AUTH_MODE: "none"
-    APP_MODE: "ci"
-    CI: true
+  AUTH_MODE: "none"
+  APP_MODE: "ci"
+  CI: true
 
 jobs:
-    frontend-ci:
-        uses: DCC-BS/ci-workflows/.github/workflows/ci.yml@2bfad28c27c02b4fe13dbadeb2b8ae970b2fae15
+  frontend-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run tsc
+
+      - name: Run unit tests
+        run: npm run test -- --run
+
+      - name: Build application
+        run: npm run build
